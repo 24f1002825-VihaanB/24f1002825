@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}My Profile – Patient{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center">
+  <div class="col-12 col-md-7 col-lg-6">
+
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">My Profile</h5>
+      </div>
+
+      <div class="card-body">
+        <form method="post">
+          <!-- Name -->
+          <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text"
+                   name="name"
+                   class="form-control"
+                   value="{{ patient.name }}"
+                   required>
+          </div>
+
+          <!-- Email (read-only) -->
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email"
+                   class="form-control"
+                   value="{{ patient.email }}"
+                   disabled>
+            <div class="form-text">
+              Email cannot be changed here.
+            </div>
+          </div>
+
+          <!-- Gender -->
+          <div class="mb-3">
+            <label class="form-label">Gender</label>
+            <select name="gender" class="form-select">
+              <option value="" {% if not patient.gender %}selected{% endif %}>Prefer not to say</option>
+              <option value="Male" {% if patient.gender == "Male" %}selected{% endif %}>Male</option>
+              <option value="Female" {% if patient.gender == "Female" %}selected{% endif %}>Female</option>
+              <option value="Other" {% if patient.gender == "Other" %}selected{% endif %}>Other</option>
+            </select>
+          </div>
+
+          <!-- Address -->
+          <div class="mb-3">
+            <label class="form-label">Address</label>
+            <input type="text"
+                   name="address"
+                   class="form-control"
+                   value="{{ patient.address or '' }}"
+                   placeholder="Your home address">
+          </div>
+
+          <hr class="my-4">
+          <h6 class="fw-semibold mb-3">Medical Details</h6>
+
+          <!-- Medical history -->
+          <div class="mb-3">
+            <label class="form-label">Past / Existing conditions</label>
+            <textarea name="medical_history"
+                      class="form-control"
+                      rows="3"
+                      placeholder="E.g. diabetes, hypertension, previous surgeries, chronic illnesses">{{ patient.medical_history or '' }}</textarea>
+          </div>
+
+          <!-- Allergies -->
+          <div class="mb-3">
+            <label class="form-label">Allergies</label>
+            <input type="text"
+                   name="allergies"
+                   class="form-control"
+                   value="{{ patient.allergies or '' }}"
+                   placeholder="E.g. penicillin, nuts, pollen, none">
+          </div>
+
+          <!-- Medications -->
+          <div class="mb-3">
+            <label class="form-label">Current medications</label>
+            <input type="text"
+                   name="current_medications"
+                   class="form-control"
+                   value="{{ patient.current_medications or '' }}"
+                   placeholder="E.g. Amlodipine 5mg, Metformin 500mg">
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 mt-2">
+            Save changes
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

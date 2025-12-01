@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}My Profile – Doctor{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center">
+  <div class="col-12 col-md-7 col-lg-6">
+
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">My Profile (Doctor)</h5>
+        <span class="badge bg-light text-muted">View only</span>
+      </div>
+
+      <div class="card-body">
+
+        <div class="mb-3">
+          <label class="form-label text-muted small mb-1">Full Name</label>
+          <div class="form-control-plaintext fw-semibold">
+            {{ doctor.name }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label text-muted small mb-1">Email</label>
+          <div class="form-control-plaintext">
+            {{ doctor.email }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label text-muted small mb-1">Department</label>
+          <div class="form-control-plaintext">
+            {{ doctor.department.name if doctor.department else "—" }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label text-muted small mb-1">Years of Experience</label>
+          <div class="form-control-plaintext">
+            {{ doctor.years_experience or 0 }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label text-muted small mb-1">Short Bio</label>
+          <div class="form-control-plaintext">
+            {{ doctor.bio or "No bio added yet." }}
+          </div>
+        </div>
+
+        <div class="alert alert-info small mt-4 mb-0">
+          Profile details can only be updated by the Admin.
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

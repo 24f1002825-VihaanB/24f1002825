@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h4 class="mb-3">Edit Doctor</h4>
+
+<div class="row g-4">
+  <div class="col-md-7">
+    <div class="card p-3">
+      <form method="post">
+        <div class="mb-3">
+          <label class="form-label">Full Name</label>
+          <input type="text" name="name" class="form-control" value="{{ doc.name }}" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" class="form-control" value="{{ doc.email }}" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Department</label>
+          <select name="department_id" class="form-select" required>
+            {% for d in depts %}
+              <option value="{{ d.id }}" {% if d.id == doc.department_id %}selected{% endif %}>
+                {{ d.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Years of Experience</label>
+          <input type="number" min="0" name="years_experience"
+                 class="form-control" value="{{ doc.years_experience or 0 }}">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">New Password (optional)</label>
+          <input type="password" name="password" class="form-control"
+                 placeholder="Leave blank to keep existing password">
+        </div>
+
+        <button class="btn btn-primary">Save Changes</button>
+        <a href="{{ url_for('admin.doctors') }}" class="btn btn-outline-secondary ms-2">Back</a>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-md-5">
+    <div class="card p-3 mb-3">
+      <h6 class="mb-2">Quick Info</h6>
+      <p class="mb-1"><strong>Name:</strong> {{ doc.name }}</p>
+      <p class="mb-1"><strong>Email:</strong> {{ doc.email }}</p>
+      <p class="mb-1"><strong>Department:</strong> {{ doc.department.name }}</p>
+      <p class="mb-1"><strong>Experience:</strong> {{ doc.years_experience }} years</p>
+      <p class="mb-1">
+        <strong>Status:</strong>
+        {% if doc.is_blacklisted %}
+          <span class="badge bg-danger">Blacklisted</span>
+        {% else %}
+          <span class="badge bg-success">Active</span>
+        {% endif %}
+      </p>
+    </div>
+
+    <div class="card p-3">
+      <h6 class="mb-2">Other Actions</h6>
+      <div class="d-grid gap-2">
+        <a href="{{ url_for('admin.toggle_blacklist', did=doc.id) }}"
+           class="btn btn-outline-warning">
+          {% if doc.is_blacklisted %}Unblacklist{% else %}Blacklist{% endif %} Doctor
+        </a>
+        <a href="{{ url_for('admin.doctor_availability', did=doc.id) }}"
+           class="btn btn-outline-primary">
+          Manage Availability
+        </a>
+        <a href="{{ url_for('admin.delete_doctor', did=doc.id) }}"
+           class="btn btn-outline-danger">
+          Delete Doctor
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

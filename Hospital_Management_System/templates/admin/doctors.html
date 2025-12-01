@@ -1,0 +1,41 @@
+{% extends "base.html" %}{% block content %}
+<h4 class="mb-3">Doctors</h4>
+<div class="row">
+  <div class="col-md-5">
+    <div class="card p-3">
+      <h6>Add Doctor</h6>
+      <form method="post">
+        <div class="mb-2"><input class="form-control" name="name" placeholder="Full name" required></div>
+        <div class="mb-2"><input class="form-control" name="email" placeholder="Email" required></div>
+        <div class="mb-2">
+          <select class="form-select" name="department_id" required>
+            <option value="">Select Department</option>
+            {% for d in depts %}<option value="{{ d.id }}">{{ d.name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="mb-2"><input class="form-control" type="number" min="0" name="years_experience" placeholder="Years"></div>
+        <button class="btn btn-primary w-100">Add</button>
+      </form>
+    </div>
+  </div>
+  <div class="col-md-7">
+    <div class="card p-3">
+      <h6>Registered Doctors</h6>
+      <table class="table table-sm">
+        <thead><tr><th>Name</th><th>Dept</th><th>Exp</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          {% for doc in doctors %}
+          <tr>
+            <td>{{ doc.name }}<div class="small text-muted">{{ doc.email }}</div></td>
+            <td>{{ doc.department.name }}</td>
+            <td>{{ doc.years_experience }} yrs</td>
+            <td>{% if doc.is_blacklisted %}<span class="badge bg-danger">Blacklisted</span>{% else %}<span class="badge bg-success">Active</span>{% endif %}</td>
+            <td><a class="btn btn-sm btn-outline-secondary" href="{{ url_for('admin.toggle_blacklist', did=doc.id) }}">Toggle</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
