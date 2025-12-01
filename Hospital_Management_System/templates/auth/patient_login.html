@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Patient Login – HMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center">
+  <div class="col-12 col-md-8 col-lg-5">
+
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4 p-md-5 text-center">
+
+        <h1 class="h3 fw-semibold mb-1 text-primary">Patient Login</h1>
+        <p class="text-muted small mb-4">
+          Sign in to book appointments, view your history and see treatment details.
+        </p>
+
+        <form method="post" novalidate>
+          <div class="mb-3 text-start">
+            <label class="form-label small fw-semibold">Email Address</label>
+            <input
+              type="email"
+              name="email"
+              class="form-control"
+              placeholder="you@example.com"
+              required
+            >
+          </div>
+
+          <div class="mb-3 text-start">
+            <label class="form-label small fw-semibold">Password</label>
+            <input
+              type="password"
+              name="password"
+              class="form-control"
+              placeholder="Enter your password"
+              required
+            >
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold mb-2">
+            Login
+          </button>
+        </form>
+
+        <div class="mt-3 small d-flex flex-column flex-md-row justify-content-between gap-2">
+          <a href="{{ url_for('auth.choose_role') }}" class="text-decoration-none">
+            &larr; Back to role selection
+          </a>
+          <a href="{{ url_for('auth.patient_register') }}" class="text-decoration-none fw-semibold">
+            New patient? Register
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

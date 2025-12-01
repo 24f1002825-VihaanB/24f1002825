@@ -1,0 +1,36 @@
+{% extends "base.html" %}{% block content %}
+<h4 class="mb-3">Find Doctors</h4>
+<form class="row g-2 mb-3" method="get">
+  <div class="col-md-8">
+    <select class="form-select" name="dept" required>
+      <option value="">Select Department</option>
+      {% for d in depts %}
+        <option value="{{ d.id }}" {% if dept_id==d.id %}selected{% endif %}>{{ d.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-4 d-grid">
+    <button class="btn btn-primary">Show Doctors</button>
+  </div>
+</form>
+
+<div class="row g-3">
+  {% for doc in docs %}
+  <div class="col-md-6">
+    <div class="card p-3">
+      <h6 class="mb-1">{{ doc.name }}</h6>
+      <div class="text-muted small">{{ doc.department.name }} • {{ doc.years_experience }} yrs</div>
+      <div class="mt-2">
+        <a class="btn btn-sm btn-primary" href="{{ url_for('patient.availability', did=doc.id) }}">Check Availability</a>
+      </div>
+    </div>
+  </div>
+  {% else %}
+    {% if dept_id %}
+      <p class="text-muted">No doctors in this department yet.</p>
+    {% else %}
+      <p class="text-muted">Select a department to view doctors.</p>
+    {% endif %}
+  {% endfor %}
+</div>
+{% endblock %}

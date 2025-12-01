@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h4 class="mb-3">Complete Appointment</h4>
+
+<div class="card p-3 mb-3">
+  <h6>Appointment Details</h6>
+  <p class="mb-1"><strong>Date:</strong> {{ ap.date }}</p>
+  <p class="mb-1"><strong>Time:</strong> {{ ap.start_time.strftime('%H:%M') }}–{{ ap.end_time.strftime('%H:%M') }}</p>
+  <p class="mb-1"><strong>Patient:</strong> {{ ap.patient.name }}</p>
+</div>
+
+<div class="card p-3">
+  <h6>Visit Details</h6>
+  <form method="post">
+    <div class="mb-2">
+      <label class="form-label">Visit Type</label>
+      <select name="visit_type" class="form-select">
+        <option value="In-person">In-person</option>
+        <option value="Online">Online</option>
+      </select>
+    </div>
+    <div class="mb-2">
+      <label class="form-label">Tests Done</label>
+      <input type="text" name="tests_done" class="form-control" placeholder="e.g., ECG, X-ray">
+    </div>
+    <div class="mb-2">
+      <label class="form-label">Diagnosis</label>
+      <textarea name="diagnosis" class="form-control" rows="2"></textarea>
+    </div>
+    <div class="mb-2">
+      <label class="form-label">Prescription / Medicines</label>
+      <textarea name="prescription" class="form-control" rows="2"></textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Additional Notes</label>
+      <textarea name="notes" class="form-control" rows="2"></textarea>
+    </div>
+    <button class="btn btn-success">Save & Mark Completed</button>
+  </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+{% block title %}Search – Admin{% endblock %}
+
+{% block content %}
+
+<div class="mb-4">
+  <h1 class="fs-4 fw-semibold mb-1">Search</h1>
+  <p class="text-muted small mb-0">
+    Search doctors by name or specialization, and patients by name. You can also see their appointments for a given day.
+  </p>
+</div>
+
+<form method="get" class="row g-2 align-items-end mb-4">
+  <div class="col-md-4">
+    <label class="form-label small text-muted">Doctor / Patient / Department</label>
+    <input type="text"
+           name="q"
+           value="{{ q or '' }}"
+           class="form-control form-control-sm"
+           placeholder="E.g. Dr. Abode, Cardiology, John Doe">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label small text-muted">Date</label>
+    <input type="date"
+           name="date"
+           value="{{ day.strftime('%Y-%m-%d') }}"
+           class="form-control form-control-sm">
+  </div>
+  <div class="col-md-3">
+    <button type="submit" class="btn btn-primary btn-sm mt-3">
+      Search
+    </button>
+    <a href="{{ url_for('admin.search') }}" class="btn btn-link btn-sm mt-3">
+      Today
+    </a>
+  </div>
+</form>
+
+<!-- Doctors -->
+<div class="card mb-4">
+  <div class="card-header bg-white">
+    <h2 class="fs-6 fw-semibold mb-0">Matching Doctors{% if q %} for “{{ q }}”{% endif %}</h2>
+  </div>
+  <div class="card-body pt-0">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Specialization (Department)</th>
+            <th>Email</th>
+            <th>Experience</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if doctors %}
+            {% for d in doctors %}
+              <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ d.name }}</td>
+                <td>{{ d.department.name if d.department else "—" }}</td>
+                <td>{{ d.email }}</td>
+                <td>{{ d.years_experience or 0 }} yrs</td>
+                <td>
+                  {% if d.is_blacklisted %}
+                    <span class="badge bg-danger-subtle text-danger">Blacklisted</span>
+                  {% else %}
+                    <span class="badge bg-success-subtle text-success">Active</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="6" class="text-muted py-3">
+                {% if q %}
+                  No doctors match this search.
+                {% else %}
+                  Enter a name or specialization to search doctors.
+                {% endif %}
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Patients -->
+<div class="card mb-4">
+  <div class="card-header bg-white">
+    <h2 class="fs-6 fw-semibold mb-0">Matching Patients{% if q %} for “{{ q }}”{% endif %}</h2>
+  </div>
+  <div class="card-body pt-0">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Gender</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if patients %}
+            {% for p in patients %}
+              <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ p.name }}</td>
+                <td>{{ p.email }}</td>
+                <td>{{ p.gender or "—" }}</td>
+                <td>
+                  {% if p.is_blacklisted %}
+                    <span class="badge bg-danger-subtle text-danger">Blacklisted</span>
+                  {% else %}
+                    <span class="badge bg-success-subtle text-success">Active</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="5" class="text-muted py-3">
+                {% if q %}
+                  No patients match this search.
+                {% else %}
+                  Enter a name to search patients.
+                {% endif %}
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Appointments for the chosen day -->
+<div class="card">
+  <div class="card-header bg-white">
+    <h2 class="fs-6 fw-semibold mb-0">
+      Appointments on {{ day.strftime('%d %b %Y') }}
+      {% if q %} (filtered by “{{ q }}”){% endif %}
+    </h2>
+  </div>
+  <div class="card-body pt-0">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Time</th>
+            <th>Doctor</th>
+            <th>Patient</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if upcoming or completed %}
+            {% for ap in upcoming %}
+              <tr>
+                <td>{{ loop.index }}</td>
+                <td>
+                  {% if ap.start_time %}
+                    {{ ap.start_time.strftime('%I:%M %p') }}
+                    {% if ap.end_time %}– {{ ap.end_time.strftime('%I:%M %p') }}{% endif %}
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+                <td>{{ ap.doctor.name if ap.doctor else "—" }}</td>
+                <td>{{ ap.patient.name if ap.patient else "—" }}</td>
+                <td>
+                  <span class="badge bg-primary-subtle text-primary">Booked</span>
+                </td>
+              </tr>
+            {% endfor %}
+            {% for ap in completed %}
+              <tr>
+                <td>{{ upcoming|length + loop.index }}</td>
+                <td>
+                  {% if ap.start_time %}
+                    {{ ap.start_time.strftime('%I:%M %p') }}
+                    {% if ap.end_time %}– {{ ap.end_time.strftime('%I:%M %p') }}{% endif %}
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+                <td>{{ ap.doctor.name if ap.doctor else "—" }}</td>
+                <td>{{ ap.patient.name if ap.patient else "—" }}</td>
+                <td>
+                  <span class="badge bg-success-subtle text-success">Completed</span>
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="5" class="text-muted py-3">
+                No appointments for this day{% if q %} with this search{% endif %}.
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

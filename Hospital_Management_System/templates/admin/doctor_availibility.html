@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h4 class="mb-3">Doctor Availability</h4>
+
+<div class="mb-2">
+  <strong>Doctor:</strong> {{ doc.name }} ({{ doc.department.name }})
+</div>
+<div class="mb-3 text-muted small">
+  Use this page to add or remove available time slots for this doctor.
+</div>
+
+<div class="row g-4">
+  <div class="col-md-5">
+    <div class="card p-3">
+      <h6 class="mb-3">Add Availability Slot</h6>
+      <form method="post">
+        <div class="mb-3">
+          <label class="form-label">Date</label>
+          <input type="date" name="date" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Start Time</label>
+          <input type="time" name="start_time" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">End Time</label>
+          <input type="time" name="end_time" class="form-control" required>
+        </div>
+        <button class="btn btn-primary w-100">Add Slot</button>
+      </form>
+      <a href="{{ url_for('admin.doctors') }}" class="btn btn-link mt-2 p-0">Back to Doctors</a>
+    </div>
+  </div>
+
+  <div class="col-md-7">
+    <div class="card p-3">
+      <h6 class="mb-3">Existing Slots</h6>
+      <table class="table table-sm align-middle">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Start</th>
+            <th>End</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in slots %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ s.date }}</td>
+            <td>{{ s.start_time.strftime('%H:%M') }}</td>
+            <td>{{ s.end_time.strftime('%H:%M') }}</td>
+            <td>
+              <a href="{{ url_for('admin.delete_availability', aid=s.id) }}"
+                 class="btn btn-sm btn-outline-danger">
+                Remove
+              </a>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="text-muted">No availability slots defined yet.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}Doctor Dashboard – HMS{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="fs-4 fw-semibold mb-1">Welcome, {{ current_user.name }}</h1>
+    <p class="text-muted small mb-0">
+      View today’s appointments, mark visits as completed, and review history.
+    </p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('doctor.manage_availability') }}" class="btn btn-outline-primary">
+      Manage Availability
+    </a>
+  </div>
+</div>
+
+<!-- Upcoming appointments -->
+<div class="card mb-4 shadow-sm">
+  <div class="card-header bg-white d-flex justify-content-between align-items-center">
+    <h2 class="fs-6 fw-semibold mb-0">Upcoming Appointments</h2>
+  </div>
+  <div class="card-body pt-0">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Patient</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if upcoming %}
+            {% for ap in upcoming %}
+              <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ ap.date.strftime('%d %b %Y') if ap.date else "—" }}</td>
+                <td>
+                  {% if ap.start_time %}
+                    {{ ap.start_time.strftime('%I:%M %p') }}
+                    {% if ap.end_time %}– {{ ap.end_time.strftime('%I:%M %p') }}{% endif %}
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+                <td>{{ ap.patient.name if ap.patient else "—" }}</td>
+                <td>
+                  {% if ap.status == 'Booked' %}
+                    <span class="badge bg-primary-subtle text-primary">Booked</span>
+                  {% elif ap.status == 'Completed' %}
+                    <span class="badge bg-success-subtle text-success">Completed</span>
+                  {% elif ap.status == 'Cancelled' %}
+                    <span class="badge bg-secondary-subtle text-muted">Cancelled</span>
+                  {% else %}
+                    <span class="badge bg-light text-muted">{{ ap.status }}</span>
+                  {% endif %}
+                </td>
+                <td class="text-end">
+                  <div class="btn-group btn-group-sm" role="group">
+                    <a
+                      href="{{ url_for('doctor.complete_appointment', aid=ap.id) }}"
+                      class="btn btn-outline-success"
+                    >
+                      Complete
+                    </a>
+
+                    <form
+                      method="post"
+                      action="{{ url_for('doctor.cancel_appointment', aid=ap.id) }}"
+                      onsubmit="return confirm('Cancel this appointment?');"
+                      class="d-inline"
+                    >
+                      <button type="submit" class="btn btn-outline-danger">
+                        Cancel
+                      </button>
+                    </form>
+
+                    {% if ap.patient %}
+                      <a
+                        href="{{ url_for('doctor.patient_history', pid=ap.patient.id) }}"
+                        class="btn btn-outline-secondary"
+                      >
+                        History
+                      </a>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="6" class="text-muted py-3">
+                No upcoming appointments.
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Recently completed -->
+<div class="card shadow-sm">
+  <div class="card-header bg-white">
+    <h2 class="fs-6 fw-semibold mb-0">Recently Completed Visits</h2>
+  </div>
+  <div class="card-body pt-0">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Patient</th>
+            <th>Diagnosis</th>
+            <th>Prescription</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if completed %}
+            {% for ap in completed %}
+              <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ ap.date.strftime('%d %b %Y') if ap.date else "—" }}</td>
+                <td>
+                  {% if ap.start_time %}
+                    {{ ap.start_time.strftime('%I:%M %p') }}
+                    {% if ap.end_time %}– {{ ap.end_time.strftime('%I:%M %p') }}{% endif %}
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+                <td>{{ ap.patient.name if ap.patient else "—" }}</td>
+                <td>
+                  {% if ap.treatment and ap.treatment.diagnosis %}
+                    {{ ap.treatment.diagnosis[:70] }}{% if ap.treatment.diagnosis|length > 70 %}…{% endif %}
+                  {% else %}
+                    <span class="text-muted small">—</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if ap.treatment and ap.treatment.prescription %}
+                    {{ ap.treatment.prescription[:70] }}{% if ap.treatment.prescription|length > 70 %}…{% endif %}
+                  {% else %}
+                    <span class="text-muted small">—</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="6" class="text-muted py-3">
+                No completed visits recorded yet.
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block title %}Appointment Details – Patient{% endblock %}
+
+{% block content %}
+
+<div class="mb-4">
+  <h1 class="fs-4 fw-semibold mb-1">Appointment Details</h1>
+  <p class="text-muted small mb-0">
+    With
+    <strong>{{ ap.doctor.name if ap.doctor else "Doctor" }}</strong>
+    {% if ap.doctor and ap.doctor.department %}
+      ({{ ap.doctor.department.name }})
+    {% endif %}
+    on
+    {% if ap.date %}
+      {{ ap.date.strftime('%d %b %Y') }}
+    {% else %}
+      —
+    {% endif %}
+  </p>
+</div>
+
+<div class="row g-4">
+
+  <!-- Appointment info -->
+  <div class="col-12 col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fs-6 fw-semibold">Appointment Summary</h5>
+      </div>
+      <div class="card-body">
+
+        <div class="mb-3">
+          <div class="text-muted small mb-1">Date</div>
+          <div class="fw-semibold">
+            {% if ap.date %}
+              {{ ap.date.strftime('%d %b %Y') }}
+            {% else %}
+              —
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="text-muted small mb-1">Time</div>
+          <div class="fw-semibold">
+            {% if ap.start_time %}
+              {{ ap.start_time.strftime('%I:%M %p') }}
+              {% if ap.end_time %}
+                – {{ ap.end_time.strftime('%I:%M %p') }}
+              {% endif %}
+            {% else %}
+              —
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="text-muted small mb-1">Doctor</div>
+          <div class="fw-semibold">
+            {{ ap.doctor.name if ap.doctor else "—" }}
+          </div>
+          {% if ap.doctor and ap.doctor.department %}
+            <div class="text-muted small">
+              {{ ap.doctor.department.name }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
+          <div class="text-muted small mb-1">Status</div>
+          {% if ap.status == 'Completed' %}
+            <span class="badge bg-success-subtle text-success">Completed</span>
+          {% elif ap.status == 'Booked' %}
+            <span class="badge bg-primary-subtle text-primary">Booked</span>
+          {% elif ap.status == 'Cancelled' %}
+            <span class="badge bg-secondary-subtle text-muted">Cancelled</span>
+          {% else %}
+            <span class="badge bg-light text-muted">{{ ap.status }}</span>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Treatment details -->
+  <div class="col-12 col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fs-6 fw-semibold">Treatment Details</h5>
+      </div>
+      <div class="card-body">
+
+        {% if ap.treatment %}
+
+          <div class="mb-3">
+            <div class="text-muted small mb-1">Visit type</div>
+            <div class="fw-semibold">
+              {{ ap.treatment.visit_type or "—" }}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="text-muted small mb-1">Tests done</div>
+            <div>
+              {{ ap.treatment.tests_done or "—" }}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="text-muted small mb-1">Diagnosis</div>
+            <div>
+              {{ ap.treatment.diagnosis or "—" }}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="text-muted small mb-1">Prescription</div>
+            <div>
+              {{ ap.treatment.prescription or "—" }}
+            </div>
+          </div>
+
+          <div class="mb-0">
+            <div class="text-muted small mb-1">Doctor's notes</div>
+            <div>
+              {{ ap.treatment.notes or "—" }}
+            </div>
+          </div>
+
+        {% else %}
+          <p class="text-muted mb-0">
+            The doctor has not added treatment details for this appointment yet.
+          </p>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="mt-3">
+  <a href="{{ url_for('patient.dashboard') }}" class="btn btn-link px-0">
+    &larr; Back to dashboard
+  </a>
+</div>
+
+{% endblock %}
