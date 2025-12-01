@@ -2,10 +2,9 @@ from datetime import datetime, date, time, timedelta
 from models.models import db, Department, Doctor, Patient, Appointment, DoctorAvailability, Admin
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import current_user
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from werkzeug.security import generate_password_hash
 from routes.auth import role_required
-from sqlalchemy import or_
 
 admin_bp = Blueprint("admin", __name__, template_folder="../templates")
 
@@ -75,6 +74,7 @@ def doctors():
         db.session.add(doc)
         db.session.commit()
 
+        # seed 7 days x 2 slots/day default availability
         today = date.today()
         slot_defs = [
             (time(10, 0), time(12, 0)),
@@ -114,6 +114,13 @@ def doctors():
 @admin_bp.route("/doctor/<int:did>/edit", methods=["GET", "POST"])
 @role_required("admin")
 def edit_doctor(did):
+    """
+    Acts as the doctor's dedicated profile page for the admin:
+    - view details
+    - edit name/email/department/experience
+    - optionally change password
+    - optionally change blacklist status
+    """
     doc = Doctor.query.get_or_404(did)
     depts = Department.query.order_by(Department.name.asc()).all()
 
@@ -123,13 +130,19 @@ def edit_doctor(did):
         doc.department_id = to_int(request.form.get("department_id"))
         doc.years_experience = to_int(request.form.get("years_experience"))
 
+        # optional password change
         new_password = request.form.get("password")
         if new_password:
             doc.password_hash = generate_password_hash(new_password)
 
+        # optional blacklist toggle from the profile form
+        # (safe even if the template doesn't send this field)
+        doc.is_blacklisted = bool(request.form.get("is_blacklisted"))
+
         db.session.commit()
-        flash("Doctor updated.", "success")
-        return redirect(url_for("admin.doctors"))
+        flash("Doctor profile updated.", "success")
+        # stay on this doctor's profile page
+        return redirect(url_for("admin.edit_doctor", did=doc.id))
 
     return render_template("admin/edit_doctor.html", doc=doc, depts=depts)
 
@@ -254,9 +267,11 @@ def search():
             .all()
         )
 
+        # include Department join here because we filter on Department.name
         base = (
             Appointment.query
             .join(Doctor)
+            .join(Department)
             .join(Patient)
             .filter(Appointment.date == day)
             .filter(

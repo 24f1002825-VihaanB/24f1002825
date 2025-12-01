@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Doctor Profile – {{ doctor.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <div class="mb-4">
+      <h1 class="fs-4 fw-semibold mb-1">Doctor Profile</h1>
+      <p class="text-muted small mb-0">
+        Manage profile details and status for <strong>{{ doctor.name }}</strong>.
+      </p>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header bg-white">
+        <h2 class="fs-6 fw-semibold mb-0">Profile Details</h2>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input
+              type="text"
+              name="name"
+              class="form-control"
+              value="{{ doctor.name }}"
+              required
+            >
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input
+              type="email"
+              name="email"
+              class="form-control"
+              value="{{ doctor.email }}"
+              required
+            >
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Department</label>
+            <select name="department_id" class="form-select" required>
+              {% for dept in departments %}
+                <option value="{{ dept.id }}" {% if dept.id == doctor.department_id %}selected{% endif %}>
+                  {{ dept.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Years of Experience</label>
+            <input
+              type="number"
+              name="years_experience"
+              class="form-control"
+              min="0"
+              value="{{ doctor.years_experience or 0 }}"
+            >
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Short Bio</label>
+            <textarea
+              name="bio"
+              class="form-control"
+              rows="4"
+            >{{ doctor.bio or "" }}</textarea>
+          </div>
+
+          <div class="form-check mb-3">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="1"
+              id="is_blacklisted"
+              name="is_blacklisted"
+              {% if doctor.is_blacklisted %}checked{% endif %}
+            >
+            <label class="form-check-label" for="is_blacklisted">
+              Blacklist this doctor (hide from patients and block login)
+            </label>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <a href="{{ url_for('admin.doctors') }}" class="btn btn-outline-secondary">
+              Back to doctors list
+            </a>
+            <button type="submit" class="btn btn-primary">
+              Save changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
